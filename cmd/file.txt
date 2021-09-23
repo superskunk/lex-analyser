@@ -1,0 +1,11 @@
+
+que tal estamos 1234
+'esto es una cadena con comillas simples'
+"Esto es una cadena con comillas dobles"
+"This is a malformed string'
+Here is a float number: 3873.55
+Here is another float number: 3873.55E+2
+Here is another one: .45E+3
+On malformed float number: .3434E
+An Integer 3434
+a char constant 'B'

@@ -1,4 +1,4 @@
-package analizer
+package lex_analyser
 
 type TokenType int64
 type token []rune

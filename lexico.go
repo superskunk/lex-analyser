@@ -1,4 +1,4 @@
-package analizer
+package lex_analyser
 
 import (
 	"io"

@@ -1,3 +1,3 @@
-module github.com/superskunk/analizer
+module github.com/superskunk/lex_analyser
 
 go 1.16

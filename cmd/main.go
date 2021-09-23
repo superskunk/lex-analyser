@@ -3,14 +3,13 @@ package main
 import (
 	"fmt"
 	"io"
-
-	"github.com/superskunk/analizer"
+	"github.com/superskunk/lex_analyser"
 )
 
 func main() {
 	fmt.Println("Starting analisis")
 
-	lex := analizer.NewLexico("file.txt")
+	lex := lex_analyser.NewLexico("file.txt")
 
 	lex.Open()
 	defer lex.Close()
