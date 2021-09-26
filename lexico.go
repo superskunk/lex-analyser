@@ -15,7 +15,7 @@ type LexAnalizer interface {
 }
 
 type lexico struct {
-	fileName      string
+	FileName      string
 	file          *os.File
 	buffer        *Buffer
 	yytext        token
@@ -26,19 +26,17 @@ type lexico struct {
 
 func NewLexico(fileName string) *lexico {
 	lex := &lexico{}
-	lex.fileName = fileName
+	lex.FileName = fileName
 	lex.buffer = NewBuffer(BufferMaxSize)
 	lex.yytext = make(token, TokenMaxLong)
 	lex.analizer = NewAnalizer()
 	return lex
 }
 
-func (l *lexico) Open() {
-	f, err := os.Open(l.fileName)
+func (l *lexico) Open() error {
+	f, err := os.Open(l.FileName)
 	l.file = f
-	if err != nil {
-		log.Fatal(err)
-	}
+	return err
 }
 
 func (l *lexico) Close() {

@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"io"
-	"github.com/superskunk/lex_analyser"
+	"log"
+
+	"github.com-superskunk/superskunk/lex_analyser"
 )
 
 func main() {
@@ -11,7 +13,10 @@ func main() {
 
 	lex := lex_analyser.NewLexico("file.txt")
 
-	lex.Open()
+	err := lex.Open()
+	if err != nil {
+		log.Fatalf("Unable to open file %s", lex.FileName)
+	}
 	defer lex.Close()
 
 	eof := false
