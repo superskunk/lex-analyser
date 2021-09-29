@@ -11,7 +11,7 @@ func (l *lexico) analizeNumber() (token, TokenType, error) {
 
 	for {
 		l.yytextPointer++
-		if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && unicode.IsDigit(l.yytext[l.yytextPointer]) {
+		if l.yytext[l.yytextPointer], err = l.getRune(); err == nil && unicode.IsDigit(l.yytext[l.yytextPointer]) {
 			continue
 		}
 		break
@@ -50,7 +50,7 @@ func (l *lexico) analizeFloatNumber() (token, TokenType, error) {
 		// Read while digits
 		for {
 			l.yytextPointer++
-			if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && unicode.IsDigit(l.yytext[l.yytextPointer]) {
+			if l.yytext[l.yytextPointer], err = l.getRune(); err == nil && unicode.IsDigit(l.yytext[l.yytextPointer]) {
 				continue
 			}
 			break
@@ -70,7 +70,7 @@ func (l *lexico) analizeFloatNumber() (token, TokenType, error) {
 	if l.yytext[l.yytextPointer] == 'E' {
 		// Now we can read a '+', '-' or a digit
 		l.yytextPointer++
-		if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && l.yytext[l.yytextPointer] != AddToken.Value() &&
+		if l.yytext[l.yytextPointer], err = l.getRune(); err == nil && l.yytext[l.yytextPointer] != AddToken.Value() &&
 			l.yytext[l.yytextPointer] != DashToken.Value() && !unicode.IsDigit(l.yytext[l.yytextPointer]) {
 			nToken := l.yytext[:l.yytextPointer]
 			return nToken, UnknownToken, ErrorWrongFloatConst
@@ -78,7 +78,7 @@ func (l *lexico) analizeFloatNumber() (token, TokenType, error) {
 
 		for {
 			l.yytextPointer++
-			if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && unicode.IsDigit(l.yytext[l.yytextPointer]) {
+			if l.yytext[l.yytextPointer], err = l.getRune(); err == nil && unicode.IsDigit(l.yytext[l.yytextPointer]) {
 				continue
 			}
 			break

@@ -36,18 +36,20 @@ func NewLexico(input io.Reader) *lexico {
 	return lex
 }
 
-func (l *lexico) readByteFromFile() (rune, error) {
+func (l *lexico) readByteFromInput() (rune, error) {
 	var buf [1]byte
 	_, err := l.input.Read(buf[:])
-	return (rune)(buf[0]), err
+	a := (rune)(buf[0])
+	return a, err
+	//return (rune)(buf[0]), err
 }
 
-func (l *lexico) getChar() (rune, error) {
+func (l *lexico) getRune() (rune, error) {
 
 	if c, err := l.buffer.getRune(); err == nil {
 		return c, nil
 	}
-	return l.readByteFromFile()
+	return l.readByteFromInput()
 }
 
 func (l *lexico) putCharBack(c rune) {
@@ -59,7 +61,7 @@ func (l *lexico) putCharBack(c rune) {
 func (l *lexico) skipBlanks() error {
 	var err error
 	for {
-		if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && isBlank(l.yytext[l.yytextPointer]) {
+		if l.yytext[l.yytextPointer], err = l.getRune(); err == nil && isBlank(l.yytext[l.yytextPointer]) {
 			if l.yytext[l.yytextPointer] == CRToken.Value() {
 				l.yylineno++
 			}

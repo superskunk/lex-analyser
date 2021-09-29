@@ -19,7 +19,7 @@ func (l *lexico) analizeIdentifier() (token, TokenType, error) {
 
 	for {
 		l.yytextPointer++
-		if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && l.isIdentifierChar(l.yytext[l.yytextPointer]) {
+		if l.yytext[l.yytextPointer], err = l.getRune(); err == nil && l.isIdentifierChar(l.yytext[l.yytextPointer]) {
 			continue
 		}
 		break

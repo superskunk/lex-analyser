@@ -9,9 +9,9 @@ func (l *lexico) analyzeString() (token, TokenType, error) {
 	quoteType := l.yytext[l.yytextPointer]
 
 	l.yytextPointer++
-	if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && l.yytext[l.yytextPointer] == BackSlashToken.Value() {
+	if l.yytext[l.yytextPointer], err = l.getRune(); err == nil && l.yytext[l.yytextPointer] == BackSlashToken.Value() {
 		l.yytextPointer++
-		l.yytext[l.yytextPointer], _ = l.getChar()
+		l.yytext[l.yytextPointer], _ = l.getRune()
 	}
 
 	if err == io.EOF {
@@ -20,7 +20,7 @@ func (l *lexico) analyzeString() (token, TokenType, error) {
 
 	for {
 		l.yytextPointer++
-		if l.yytext[l.yytextPointer], err = l.getChar(); err == nil &&
+		if l.yytext[l.yytextPointer], err = l.getRune(); err == nil &&
 			l.yytext[l.yytextPointer] != QuoteToken.Value() &&
 			l.yytext[l.yytextPointer] != DoubleQuoteToken.Value() {
 			continue
