@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io"
 	"log"
-	"os"
 	"unicode"
 )
 
@@ -22,35 +21,24 @@ type LexAnalizer interface {
 }
 
 type lexico struct {
-	FileName      string
-	file          *os.File
+	input         io.Reader
 	buffer        *Buffer
 	yytext        token
 	yytextPointer int
 	yylineno      int
 }
 
-func NewLexico(fileName string) *lexico {
+func NewLexico(input io.Reader) *lexico {
 	lex := &lexico{}
-	lex.FileName = fileName
+	lex.input = input
 	lex.buffer = NewBuffer(BufferMaxSize)
 	lex.yytext = make(token, TokenMaxLong)
 	return lex
 }
 
-func (l *lexico) Open() error {
-	f, err := os.Open(l.FileName)
-	l.file = f
-	return err
-}
-
-func (l *lexico) Close() {
-	l.file.Close()
-}
-
 func (l *lexico) readByteFromFile() (rune, error) {
 	var buf [1]byte
-	_, err := l.file.Read(buf[:])
+	_, err := l.input.Read(buf[:])
 	return (rune)(buf[0]), err
 }
 

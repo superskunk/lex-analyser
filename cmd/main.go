@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 
 	"github.com-superskunk/superskunk/lex_analyser"
 )
@@ -11,13 +12,15 @@ import (
 func main() {
 	fmt.Println("Starting analisis")
 
-	lex := lex_analyser.NewLexico("file.txt")
+	f, err := os.Open("file.txt")
 
-	err := lex.Open()
 	if err != nil {
-		log.Fatalf("Unable to open file %s", lex.FileName)
+		log.Fatalf("Unable to open file %s", "file.txt")
 	}
-	defer lex.Close()
+
+	lex := lex_analyser.NewLexico(f)
+
+	defer f.Close()
 
 	eof := false
 
