@@ -1,10 +1,17 @@
 package lex_analyser
 
 import (
+	"errors"
 	"io"
 	"log"
 	"os"
 	"unicode"
+)
+
+var (
+	ErrorWrongFloatConst  error = errors.New("error, float const is not well formed")
+	ErrorWrongCharConst   error = errors.New("error, char const is not well formed")
+	ErrorWrongStringConst error = errors.New("error, string const is not well formed")
 )
 
 const TokenMaxLong = 100
@@ -21,7 +28,6 @@ type lexico struct {
 	yytext        token
 	yytextPointer int
 	yylineno      int
-	analizer      LexAnalizer
 }
 
 func NewLexico(fileName string) *lexico {
@@ -29,7 +35,6 @@ func NewLexico(fileName string) *lexico {
 	lex.FileName = fileName
 	lex.buffer = NewBuffer(BufferMaxSize)
 	lex.yytext = make(token, TokenMaxLong)
-	lex.analizer = NewAnalizer()
 	return lex
 }
 
@@ -79,163 +84,6 @@ func (l *lexico) skipBlanks() error {
 	return err
 }
 
-func (l *lexico) analizeIdentifier() (token, TokenType, error) {
-	var nToken token
-	var err error
-
-	for {
-		l.yytextPointer++
-		if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && l.analizer.isIdentifierChar(l.yytext[l.yytextPointer]) {
-			continue
-		}
-		break
-	}
-
-	nToken = l.yytext[:l.yytextPointer]
-	l.putCharBack(l.yytext[l.yytextPointer])
-	tokenType := IdentifierToken
-
-	if err == io.EOF {
-		tokenType = EOFToken
-	}
-
-	return nToken, tokenType, err
-
-}
-
-func (l *lexico) analizeNumber() (token, TokenType, error) {
-	var nToken token
-	var err error
-
-	for {
-		l.yytextPointer++
-		if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && unicode.IsDigit(l.yytext[l.yytextPointer]) {
-			continue
-		}
-		break
-	}
-
-	if err == io.EOF {
-		return l.yytext, EOFToken, err
-	}
-
-	// We replace E by .0E
-	// e.g: 50E = 50.0E
-	if l.yytext[l.yytextPointer] == 'E' {
-		exp := l.yytext[l.yytextPointer : l.yytextPointer+3]
-		// as exp is a subslice from l.yytext, changes made in exp have effect in l.yytext
-		copy(exp, []rune{PeriodToken.Value(), '0', 'E'})
-		l.yytextPointer += 2
-
-	}
-
-	// If it is not a '.' neither an 'E', then it is an int
-
-	if l.yytext[l.yytextPointer] != PeriodToken.Value() && l.yytext[l.yytextPointer] != 'E' {
-		nToken = l.yytext[:l.yytextPointer]
-		l.putCharBack(l.yytext[l.yytextPointer])
-		//l.buffer.putRune(l.yytext[l.yytextPointer])
-		return nToken, IntegerConstantToken, nil
-	}
-	return nToken, FloatConstantToken, nil
-}
-
-func (l *lexico) analizeFloatNumber() (token, TokenType, error) {
-	var nToken token
-	var err error
-
-	if l.yytext[l.yytextPointer] == PeriodToken.Value() {
-		// Read while digits
-		for {
-			l.yytextPointer++
-			if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && unicode.IsDigit(l.yytext[l.yytextPointer]) {
-				continue
-			}
-			break
-		}
-
-		if err == io.EOF {
-			return l.yytext, EOFToken, err
-		}
-	}
-
-	if l.yytext[l.yytextPointer] == 'E' && l.yytext[l.yytextPointer-1] == PeriodToken.Value() {
-		exp := l.yytext[l.yytextPointer : l.yytextPointer+2]
-		copy(exp, []rune{'0', 'E'})
-		l.yytextPointer += 2
-	}
-
-	if l.yytext[l.yytextPointer] == 'E' {
-		// Now we can read a '+', '-' or a digit
-		l.yytextPointer++
-		if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && l.yytext[l.yytextPointer] != AddToken.Value() &&
-			l.yytext[l.yytextPointer] != DashToken.Value() && !unicode.IsDigit(l.yytext[l.yytextPointer]) {
-			nToken := l.yytext[:l.yytextPointer]
-			return nToken, UnknownToken, ErrorWrongFloatConst
-		}
-
-		for {
-			l.yytextPointer++
-			if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && unicode.IsDigit(l.yytext[l.yytextPointer]) {
-				continue
-			}
-			break
-		}
-
-		if err == io.EOF {
-			return l.yytext, EOFToken, err
-		}
-
-	}
-
-	nToken = l.yytext[:l.yytextPointer]
-	l.putCharBack(l.yytext[l.yytextPointer])
-	if l.yytextPointer == 1 {
-		return nToken, PeriodToken, nil
-	}
-	return nToken, FloatConstantToken, nil
-
-}
-
-func (l *lexico) analizeString() (token, TokenType, error) {
-	var nToken token
-	var err error
-
-	quoteType := l.yytext[l.yytextPointer]
-
-	l.yytextPointer++
-	if l.yytext[l.yytextPointer], err = l.getChar(); err == nil && l.yytext[l.yytextPointer] == BackSlashToken.Value() {
-		l.yytextPointer++
-		l.yytext[l.yytextPointer], _ = l.getChar()
-	}
-
-	if err == io.EOF {
-		return nToken, EOFToken, err
-	}
-
-	for {
-		l.yytextPointer++
-		if l.yytext[l.yytextPointer], err = l.getChar(); err == nil &&
-			l.yytext[l.yytextPointer] != QuoteToken.Value() &&
-			l.yytext[l.yytextPointer] != DoubleQuoteToken.Value() {
-			continue
-		}
-		break
-	}
-
-	if err == io.EOF {
-		return nToken, EOFToken, err
-	}
-
-	nToken = l.yytext[:l.yytextPointer+1]
-
-	if nToken[l.yytextPointer] != quoteType {
-		return nToken, UnknownToken, ErrorWrongStringConst
-	}
-
-	return nToken, StringConstantToken, nil
-}
-
 func (l *lexico) NextToken() (token, TokenType, error) {
 	//TODO
 	var err error
@@ -248,7 +96,7 @@ func (l *lexico) NextToken() (token, TokenType, error) {
 		return l.yytext, EOFToken, err
 	}
 
-	if l.analizer.isIdentifierStarter(l.yytext[l.yytextPointer]) {
+	if l.isIdentifierStarter(l.yytext[l.yytextPointer]) {
 		return l.analizeIdentifier()
 	}
 
@@ -267,7 +115,7 @@ func (l *lexico) NextToken() (token, TokenType, error) {
 	}
 
 	if l.yytext[l.yytextPointer] == QuoteToken.Value() || l.yytext[l.yytextPointer] == DoubleQuoteToken.Value() {
-		return l.analizeString()
+		return l.analyzeString()
 	}
 
 	nToken = l.yytext[:l.yytextPointer+1]
