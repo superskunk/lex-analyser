@@ -44,8 +44,12 @@ const (
 	UnknownToken = -101
 )
 
+// blanks is a uint that has four 1 bits activated (e.g: 1 << 10 --> 2^10 = 1024 = (64 bits) 0000 ... 0100 0000 0000)
+const blanks = 1<<'\t' | 1<<'\n' | 1<<'\r' | 1<<' '
+
 var symbols = [...]rune{'{', '}', '(', ')', '\'', '"', '&', '|', '=', '.', ',', ':', ';', '+', '-', '¿', '?', '¡', '!', '^', '>', '<', '%', '*', '/', '\\', '_', '\n', ' ', '\t'}
-var blanks = [...]rune{'\n', ' ', '\t'}
+
+//var blanks = [...]rune{'\n', ' ', '\t'}
 var tokenNames = [...]string{
 	"CurlyBracesOpenedToken",
 	"CurlyBracesClosedToken",
@@ -115,10 +119,5 @@ func getTokenType(r rune) TokenType {
 }
 
 func isBlank(r rune) bool {
-	for _, v := range blanks {
-		if v == r {
-			return true
-		}
-	}
-	return false
+	return blanks&(1<<uint(r)) != 0
 }
