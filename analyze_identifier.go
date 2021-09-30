@@ -26,7 +26,7 @@ func (l *lexico) analizeIdentifier() (token, TokenType, error) {
 	}
 
 	nToken = l.yytext[:l.yytextPointer]
-	l.putCharBack(l.yytext[l.yytextPointer])
+	err = l.putCharBack(l.yytext[l.yytextPointer])
 	tokenType := IdentifierToken
 
 	if err == io.EOF {

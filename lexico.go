@@ -3,7 +3,6 @@ package lex_analyser
 import (
 	"errors"
 	"io"
-	"log"
 	"unicode"
 )
 
@@ -52,10 +51,12 @@ func (l *lexico) getRune() (rune, error) {
 	return l.readByteFromInput()
 }
 
-func (l *lexico) putCharBack(c rune) {
-	if err := l.buffer.putRune(c); err != nil {
-		log.Fatalf("%s", err.Error())
-	}
+func (l *lexico) putCharBack(c rune) error {
+	return l.buffer.putRune(c)
+
+	// if err := l.buffer.putRune(c); err != nil {
+	// 	log.Fatalf("%s", err.Error())
+	// }
 }
 
 func (l *lexico) skipBlanks() error {

@@ -35,9 +35,9 @@ func (l *lexico) analizeNumber() (token, TokenType, error) {
 
 	if l.yytext[l.yytextPointer] != PeriodToken.Value() && l.yytext[l.yytextPointer] != 'E' {
 		nToken = l.yytext[:l.yytextPointer]
-		l.putCharBack(l.yytext[l.yytextPointer])
+		err := l.putCharBack(l.yytext[l.yytextPointer])
 		//l.buffer.putRune(l.yytext[l.yytextPointer])
-		return nToken, IntegerConstantToken, nil
+		return nToken, IntegerConstantToken, err
 	}
 	return nToken, FloatConstantToken, nil
 }
@@ -91,10 +91,11 @@ func (l *lexico) analizeFloatNumber() (token, TokenType, error) {
 	}
 
 	nToken = l.yytext[:l.yytextPointer]
-	l.putCharBack(l.yytext[l.yytextPointer])
+	err = l.putCharBack(l.yytext[l.yytextPointer])
+
 	if l.yytextPointer == 1 {
-		return nToken, PeriodToken, nil
+		return nToken, PeriodToken, err
 	}
-	return nToken, FloatConstantToken, nil
+	return nToken, FloatConstantToken, err
 
 }

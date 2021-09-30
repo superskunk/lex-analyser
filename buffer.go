@@ -31,10 +31,10 @@ func (b *Buffer) getRune() (rune, error) {
 }
 
 func (b *Buffer) putRune(c rune) error {
+	b.pBuff++
 	if b.pBuff == b.bufSize {
 		return ErrorBufferOverflow
 	}
-	b.pBuff++
 	b.buf[b.pBuff] = c
 	return nil
 }
