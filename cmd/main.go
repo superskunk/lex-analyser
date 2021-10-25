@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com-superskunk/superskunk/lex_analyser"
+	"github.com/superskunk/lex_analyser"
 )
 
 func main() {
